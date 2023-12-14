@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native';
-
 import { Option } from '../Option';
 import { styles } from './styles';
+
 
 type QuestionProps = {
   title: string;
@@ -15,6 +15,9 @@ type Props = {
 }
 
 export function Question({ question, alternativeSelected, setAlternativeSelected }: Props) {
+
+
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
