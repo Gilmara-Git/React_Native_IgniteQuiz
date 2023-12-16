@@ -52,7 +52,6 @@ export function Quiz() {
   })
 
   function shakeAnimation(){
-
     shake.value = withSequence(
       withTiming(3), 
       withTiming(0)
