@@ -13,6 +13,10 @@ export const styles = StyleSheet.create({
     fontSize:16,
     fontFamily: THEME.FONTS.BOLD,
   },
+  header:{
+    width: '100%',
+    marginBottom: 21
+  },
   question: {
     alignItems: 'center',
     paddingTop: 80,

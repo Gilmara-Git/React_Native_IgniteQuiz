@@ -4,7 +4,8 @@ import Animated,
 { withTiming, 
   useSharedValue, 
   withSequence, 
-  interpolate, 
+  interpolate,
+  Extrapolate, 
   useAnimatedStyle, 
   useAnimatedScrollHandler} from 'react-native-reanimated';
 
@@ -60,19 +61,31 @@ export function Quiz() {
 
   const fixedProgressBarStyleAnimated = useAnimatedStyle(()=>{
     return{
+      zIndex: 1,
       position: 'absolute',
       backgroundColor: THEME.COLORS.GREY_500,
       paddingTop: 50,
       width: '110%',
-      left: '-5%'
-    // 
+      left: '-5%',
+      opacity: interpolate(scrollY.value, [50, 90],[0, 1], Extrapolate.CLAMP),
+      transform: [
+        { translateY: interpolate(scrollY.value, [50,100],[-40, 0],  Extrapolate.CLAMP)}]
+
   }
+  })
+
+  const headerStyles = useAnimatedStyle(()=>{
+    return{
+      width: '100%',
+      opacity: interpolate(scrollY.value, [60, 90],[1, 0], Extrapolate.CLAMP),
+
+    }
   })
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll:(event)=>{
       scrollY.value = event.contentOffset.y;
-      console.log(scrollY.value)
+  
     }
   })
 
@@ -175,6 +188,7 @@ export function Quiz() {
             />
 
       </Animated.View>
+
       <Animated.ScrollView
         onScroll={scrollHandler}
         scrollEventThrottle={16}
@@ -183,12 +197,13 @@ export function Quiz() {
 
       >
 
-        
+        <Animated.View style={[headerStyles, styles.header]}>
           <QuizHeader
             title={quiz.title}
             currentQuestion={currentQuestion + 1}
             totalOfQuestions={quiz.questions.length}
-          />
+            />
+        </Animated.View>
 
         <Animated.View style={shakeAnimationStyle}>
           <Question
