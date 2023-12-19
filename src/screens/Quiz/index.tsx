@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, View , Text } from 'react-native';
 import Animated, 
 { withTiming, 
   useSharedValue, 
@@ -20,6 +20,10 @@ import { Question } from '../../components/Question';
 import { QuizHeader } from '../../components/QuizHeader';
 import { ConfirmButton } from '../../components/ConfirmButton';
 import { OutlineButton } from '../../components/OutlineButton';
+import { ProgressBar } from '../../components/ProgressBar';
+
+import { THEME } from '../../styles/theme';
+
 
 interface Params {
   id: string;
@@ -42,6 +46,7 @@ export function Quiz() {
   const shake = useSharedValue(0);
   const  scrollY = useSharedValue(0);
   
+
   const shakeAnimationStyle = useAnimatedStyle(()=>{
     return {
       transform: [{ 
@@ -53,9 +58,21 @@ export function Quiz() {
     }
   })
 
+  const fixedProgressBarStyleAnimated = useAnimatedStyle(()=>{
+    return{
+      position: 'absolute',
+      backgroundColor: THEME.COLORS.GREY_500,
+      paddingTop: 50,
+      width: '110%',
+      left: '-5%'
+    // 
+  }
+  })
+
   const scrollHandler = useAnimatedScrollHandler({
     onScroll:(event)=>{
       scrollY.value = event.contentOffset.y;
+      console.log(scrollY.value)
     }
   })
 
@@ -147,12 +164,26 @@ export function Quiz() {
 
   return (
     <View style={styles.container}>
+      <Animated.View style={fixedProgressBarStyleAnimated}>
+        <Text style={styles.title}>
+          {quiz.title}
+        </Text>
+        
+        <ProgressBar 
+            total={quiz.questions.length}
+            current={currentQuestion + 1}
+            />
+
+      </Animated.View>
       <Animated.ScrollView
         onScroll={scrollHandler}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.question}
+
       >
+
+        
           <QuizHeader
             title={quiz.title}
             currentQuestion={currentQuestion + 1}

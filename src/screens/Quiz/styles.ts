@@ -6,6 +6,13 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: THEME.COLORS.GREY_800,
   },
+  title:{
+    color: THEME.COLORS.GREY_300,
+    marginBottom: 7,
+    textAlign: 'center',
+    fontSize:16,
+    fontFamily: THEME.FONTS.BOLD,
+  },
   question: {
     alignItems: 'center',
     paddingTop: 80,
