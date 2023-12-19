@@ -19,7 +19,6 @@ type Props = {
 export function Question({ question, alternativeSelected, setAlternativeSelected }: Props) {
 
   const SCREEN_WIDTH = Dimensions.get('window').width;
-  console.log(SCREEN_WIDTH);
 
   const enteringKeyFrame = new Keyframe({
     0: {
