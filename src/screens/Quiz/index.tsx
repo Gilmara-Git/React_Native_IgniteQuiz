@@ -7,9 +7,12 @@ import Animated,
   interpolate,
   Extrapolate, 
   useAnimatedStyle, 
-  useAnimatedScrollHandler} from 'react-native-reanimated';
+  useAnimatedScrollHandler, 
+  runOnJS
+} from 'react-native-reanimated';
 
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { styles } from './styles';
 
@@ -32,6 +35,9 @@ interface Params {
 
 type QuizProps = typeof QUIZ[0];
 
+const CARD_INCLINATION = 10;
+const CARD_SKIP_AREA = (-200);
+
 export function Quiz() {
   const [points, setPoints] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,7 +51,8 @@ export function Quiz() {
   const { id } = route.params as Params;
   
   const shake = useSharedValue(0);
-  const  scrollY = useSharedValue(0);
+  const scrollY = useSharedValue(0);
+  const cardPosition = useSharedValue(0);
   
 
   const shakeAnimationStyle = useAnimatedStyle(()=>{
@@ -82,12 +89,51 @@ export function Quiz() {
     }
   })
 
+  const draggingAnimationOnQuestionCard = useAnimatedStyle(()=>{
+    const rotateZ =  cardPosition.value/ CARD_INCLINATION;
+    return {
+      transform: [
+        { translateX: cardPosition.value },
+        { rotateZ: `${rotateZ}deg`}
+        
+      ]
+
+    }
+  })
+
   const scrollHandler = useAnimatedScrollHandler({
     onScroll:(event)=>{
       scrollY.value = event.contentOffset.y;
   
     }
   })
+
+// const onLongPress =  Gesture.LongPress()
+// .minDuration(200)
+// .onStart(event => {
+//   console.log('Long Press')
+// })
+
+
+  const onPan = Gesture.Pan();
+  onPan
+  .activateAfterLongPress(200)
+  .onUpdate(event=>{
+ 
+    const movedToLeft = event.translationX < 0;
+
+    if(movedToLeft){
+      cardPosition.value = event.translationX;
+      
+    }
+  })
+  .onEnd((event)=>{
+   if(event.translationX < CARD_SKIP_AREA){
+      runOnJS(handleSkipConfirm)();
+   }
+
+    cardPosition.value = withTiming(0);
+  }) 
 
   function shakeAnimation(){
     shake.value = withSequence(
@@ -159,6 +205,8 @@ export function Quiz() {
     return true;
   }
 
+ 
+
   useEffect(() => {
     const quizSelected = QUIZ.filter(item => item.id === id)[0];
     setQuiz(quizSelected);
@@ -205,14 +253,17 @@ export function Quiz() {
             />
         </Animated.View>
 
-        <Animated.View style={shakeAnimationStyle}>
-          <Question
-            key={quiz.questions[currentQuestion].title}
-            question={quiz.questions[currentQuestion]}
-            alternativeSelected={alternativeSelected}
-            setAlternativeSelected={setAlternativeSelected}
-            />
-          </Animated.View>
+        <GestureDetector gesture={onPan}>
+                <Animated.View style={[shakeAnimationStyle, draggingAnimationOnQuestionCard]}>
+                  <Question
+                    key={quiz.questions[currentQuestion].title}
+                    question={quiz.questions[currentQuestion]}
+                    alternativeSelected={alternativeSelected}
+                    setAlternativeSelected={setAlternativeSelected}
+                    />
+                  </Animated.View>
+
+        </GestureDetector>
 
         <View style={styles.footer}>
           <OutlineButton title="Parar" onPress={handleStop} />
