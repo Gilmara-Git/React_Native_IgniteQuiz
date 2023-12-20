@@ -93,13 +93,13 @@ export function History() {
                   }}
                     containerStyle={styles.swipableContainer}
                     overshootLeft={false}
-                    // renderRightActions={()=>null}
+                    renderRightActions={()=>null}
                     onSwipeableOpen={()=>handleRemove(item.id, index)}
                     leftThreshold={10}
                     renderLeftActions={()=>
                     <View 
                       style={styles.swipableRemove}
-                      // onPress={()=>handleRemove(item.id, index)}
+                     
                       >
                       <Trash color={THEME.COLORS.GREY_100} size={32}/>
                   </View>
