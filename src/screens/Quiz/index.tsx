@@ -30,6 +30,8 @@ import { OverlayFeedback } from '../../components/OverlayFeedback';
 
 import { THEME } from '../../styles/theme';
 
+import { Audio } from 'expo-av';
+
 
 interface Params {
   id: string;
@@ -57,7 +59,19 @@ export function Quiz() {
   const scrollY = useSharedValue(0);
   const cardPosition = useSharedValue(0);
 
-  
+  const playSound = async (isCorrect: boolean)=>{
+    const fileToPlay =  isCorrect? require('../../assets/correct.mp3'): require('../../assets/wrong.mp3') ;
+    
+    try{
+      const { sound }  = await Audio.Sound.createAsync(fileToPlay, { shouldPlay: true});
+      await sound.playAsync();
+      await sound.setPositionAsync(0); // to guarantee that audio will play from its beginning
+      await sound.unloadAsync();
+
+    }catch(error){
+      console.log(error)
+    }
+  };
 
   const shakeAnimationStyle = useAnimatedStyle(()=>{
     return {
@@ -175,6 +189,7 @@ export function Quiz() {
   }
 
   function handleNextQuestion() {
+  
     if (currentQuestion < quiz.questions.length - 1) {
       setCurrentQuestion(prevState => prevState + 1)
     } else {
@@ -188,10 +203,13 @@ export function Quiz() {
     }
 
     if (quiz.questions[currentQuestion].correct === alternativeSelected) {
-      setStatusReply(1);
       setPoints(prevState => prevState + 1);
+      setStatusReply(1);
+
+      await playSound(true);
       handleNextQuestion(); 
     }else {
+      await playSound(false);
       setStatusReply(2);
       shakeAnimation();
     
@@ -224,11 +242,7 @@ export function Quiz() {
     setIsLoading(false);
   }, []);
 
-  useEffect(() => {
-    if (quiz.questions) {
-      handleNextQuestion();
-    }
-  }, [points]);
+
 
   if (isLoading) {
     return <Loading />
