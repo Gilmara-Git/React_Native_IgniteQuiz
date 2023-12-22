@@ -1,5 +1,5 @@
 import { useEffect, useState  } from 'react';
-import { Alert, View , Text } from 'react-native';
+import { Alert, View , Text , BackHandler } from 'react-native';
 import Animated, 
 { withTiming, 
   useSharedValue, 
@@ -31,6 +31,7 @@ import { OverlayFeedback } from '../../components/OverlayFeedback';
 import { THEME } from '../../styles/theme';
 
 import { Audio } from 'expo-av';
+import * as Haptics from 'expo-haptics'
 
 
 interface Params {
@@ -153,7 +154,9 @@ export function Quiz() {
     cardPosition.value = withTiming(0);
   }) 
 
-  function shakeAnimation(){
+  async function shakeAnimation(){
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+
     shake.value = withSequence(
       withTiming(3, {duration:400, easing: Easing.bounce}), 
       withTiming(0, undefined, (finished)=>{
@@ -242,7 +245,13 @@ export function Quiz() {
     setIsLoading(false);
   }, []);
 
+  useEffect(()=>{
+    // this works only for android (manipular  the physical back button)
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleStop);
+    
+    return ()=> backHandler.remove();
 
+  },[])
 
   if (isLoading) {
     return <Loading />
