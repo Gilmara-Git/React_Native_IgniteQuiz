@@ -5,30 +5,36 @@ import { Quiz } from '../screens/Quiz';
 import { Finish } from '../screens/Finish';
 import { History } from '../screens/History';
 
-const { Navigator, Screen } = createNativeStackNavigator();
+const { Navigator, Screen , Group } = createNativeStackNavigator();
 
 export function AppRoutes() {
   return (
     <Navigator
       screenOptions={{
-        headerShown: false
+        headerShown: false,
+       
       }}
     >
       <Screen
         name="home"
         component={Home}
       />
-      <Screen
-        name="quiz"
-        component={Quiz}
-      />
+      <Group screenOptions={{gestureEnabled: false}}>
+        <Screen
+          name="quiz"
+          component={Quiz}
+        
+          />
+          <Screen
+            name="finish"
+            component={Finish}
+        
+            />
+        </Group>
       <Screen
         name="history"
         component={History}
-      />
-      <Screen
-        name="finish"
-        component={Finish}
+        
       />
     </Navigator>
   )
